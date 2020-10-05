@@ -65,6 +65,7 @@ RCT_EXPORT_METHOD(close)
     }
     
     [self.connection close];
+    [self.channel close];
     [self.queues removeAllObjects];
     [self.exchanges removeAllObjects];
     
