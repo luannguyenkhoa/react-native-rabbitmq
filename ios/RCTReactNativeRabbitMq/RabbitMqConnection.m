@@ -63,9 +63,8 @@ RCT_EXPORT_METHOD(close)
     for(id q in self.queues) {
         [q cancelConsumer];
     }
-    
-    [self.connection close];
     [self.channel close];
+    [self.connection close];
     [self.queues removeAllObjects];
     [self.exchanges removeAllObjects];
     
@@ -76,6 +75,7 @@ RCT_EXPORT_METHOD(addQueue:(NSDictionary *) config arguments:(NSDictionary *)arg
 {
     if (self.connected){ 
         self.channel = [self.connection createChannel];
+        [self.channel basicQos:[NSNumber numberWithInt:1] global: NO];
 
         RabbitMqQueue *queue = [[RabbitMqQueue alloc] initWithConfig:config channel:self.channel];
 
@@ -116,11 +116,12 @@ RCT_EXPORT_METHOD(removeQueue:(NSString *)queue_name)
 
 RCT_EXPORT_METHOD(basicAck:(NSString *)queue_name delivery_tag:(nonnull NSNumber *)delivery_tag)
 {
-    id queue_id = [self findQueue:queue_name];
+    [self.channel ack:delivery_tag];
+    // id queue_id = [self findQueue:queue_name];
 
-    if (queue_id != nil){
-        [queue_id ack:delivery_tag];
-    }
+    // if (queue_id != nil){
+    //     [queue_id ack:delivery_tag];
+    // }
 }
 
 RCT_EXPORT_METHOD(cancelConsumer:(NSString *)queue_name)
